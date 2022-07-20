@@ -7,9 +7,18 @@ import datetime
 
 
 def process_song_file(cur, filepath):
+    
+    """
+    This Function is created for ingesting songs folder data
+    
+    -> With this function the insertion in the song table is done
+    
+    -> Insertion in artist table is also performed by this function
+    
+    """
     # open song file
     print(filepath)
-    df = pd.read_json(filepath,typ='series')
+    df = pd.read_json(filepath,typ='Series')
     #df.show()
 
     # insert song record
@@ -17,11 +26,20 @@ def process_song_file(cur, filepath):
     cur.execute(song_table_insert, song_data)
     
     # insert artist record
-    artist_data = df[['artist_id', 'name', 'location', 'latitude', 'longitude']]
+    artist_data = df[['artist_id', 'artist_name', 'artist_location', 'artist_latitude', 'artist_longitude']]
     cur.execute(artist_table_insert, artist_data)
 
 
 def process_log_file(cur, filepath):
+    """
+    This Function is created for ingesting logs folder data
+    
+    -> With this function the insertion in the songplays,time and users table is done.
+     
+     -> Every file is read one by one and suitable records for table
+     are inserted
+    
+    """
     # open log file
     df = pd.read_json(filepath,lines=True)
 
@@ -32,6 +50,7 @@ def process_log_file(cur, filepath):
     t = pd.to_datetime(df['ts'],unit='ms')
     # insert time data records
     time_data =[t,t.dt.hour,t.dt.day,t.dt.week,t.dt.month,t.dt.year,t.dt.weekday]
+    #column names for dataframe
     column_labels = ['start_time','hour','day','week','month','year','weekday']
     emdi={}
     for i in range(len(column_labels)):
@@ -58,6 +77,8 @@ def process_log_file(cur, filepath):
         
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
+            
+        #fetches the result from cursor
         results = cur.fetchone()
         
         if results:
@@ -66,8 +87,9 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        
-        songplay_data = [pd.to_datetime(row.ts ,unit='ms'),row.userId,row.level,songid,artistid,row.sessionId,row.location,row.userAgent]
+        k=pd.to_datetime(row.ts ,unit='ms')
+        #print("I am K : ",k," ",songid," ",artistid)
+        songplay_data = (k,row.userId,row.level,songid,artistid,row.sessionId,row.location,row.userAgent)
         try:
             cur.execute(songplay_table_insert, songplay_data)
         except:
@@ -77,6 +99,11 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    This function gets all the files present in a path.
+    and call the function which is required.
+    for further loading of data into the tables
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
