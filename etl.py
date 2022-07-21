@@ -85,7 +85,8 @@ def process_log_file(cur, filepath):
             songid, artistid = results
         else:
             songid, artistid = None, None
-
+        
+        #print(songid," ",artistid)
         # insert songplay record
         k=pd.to_datetime(row.ts ,unit='ms')
         #print("I am K : ",k," ",songid," ",artistid)
@@ -94,6 +95,17 @@ def process_log_file(cur, filepath):
             cur.execute(songplay_table_insert, songplay_data)
         except:
             print("Errored DATA: ",songplay_data)
+            
+#below command is for testing
+#         if songid is not None: 
+#             print(songplay_data)
+            
+        
+#         cur.execute("""SELECT DISTINCT song_id,artist_id from songplays """)
+#         res=cur.fetchall()
+#         #print(songid," ",artistid)
+#         for i in res:
+#             print(i)
             
         
 

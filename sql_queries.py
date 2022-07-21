@@ -16,7 +16,7 @@ user_id int NOT NULL,
 level varchar,
 song_id varchar ,
 artist_id varchar,
-session_id int UNIQUE,
+session_id int ,
 location varchar,
 user_agent text 
 );
@@ -68,7 +68,7 @@ weekday int
 # INSERT RECORDS
 
 songplay_table_insert = ("""
-INSERT INTO songplays(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) VALUES(%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (session_id) DO NOTHING
+INSERT INTO songplays(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) VALUES(%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT  DO NOTHING
 """)
 
 user_table_insert = ("""
